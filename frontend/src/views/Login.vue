@@ -15,22 +15,22 @@ export default {
             <div class="row">
                 <div class="col-1">
                     <i class="fab fa-twitter"></i>
-                    <h1 role="heading"><span>Twitter'a giriş yap</span></h1>
+                    <h1 role="heading"><span>Log in to Twitter</span></h1>
                 </div>
                 <div class="col-2">
                     <form>
                         <div class="form-group">
                             <input type="email" name="email" class="form-field" v-model="email">
-                            <label for="email" class="form-label" :class="[email ? 'top-5' : '']">E-posta</label>
+                            <label for="email" class="form-label" :class="[email ? 'top-5' : '']">Email</label>
                             <input type="password" name="password" id="password" class="form-field" v-model="password">
-                            <label for="password" class="form-label" :class="[password ? 'top-85' : '']">Şifre</label>
+                            <label for="password" class="form-label" :class="[password ? 'top-85' : '']">Password</label>
                             <input type="submit" value="Giriş yap" class="form-field" :disabled="!email || !password">
                         </div>
                     </form>
                 </div>
                 <div class="col-3">
-                    <router-link to="/begin_password_reset" class="link link-1">Şifreni mi unuttun?</router-link> .
-                    <router-link to="/signup" class="link link-2">Twitter'a kaydol</router-link>
+                    <router-link to="/begin_password_reset" class="link link-1">Forgot password?</router-link> .
+                    <router-link to="/signup" class="link link-2">Sign up for Twitter</router-link>
                 </div>
             </div>
         </div>

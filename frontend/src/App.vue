@@ -24,5 +24,8 @@
     font-size: 4rem;
     color: rgba(29,161,242,1.00);
   }
+  input[type=checkbox]{
+    cursor: pointer;
+  }
 }
 </style>

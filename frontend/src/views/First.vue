@@ -14,14 +14,14 @@ export default {
           <i class="fab fa-twitter"></i>
         </div>
         <div class="col-2">
-          <span>Şu anda olup bitenler</span>
+          <span>Happening now</span>
         </div>
         <div class="col-3">
-          <span>Twitter'a bugün katıl.</span>
+          <span>Join Twitter today.</span>
         </div>
         <div class="col-4">
-          <router-link to="/signup" role="link" class="link link-1">Kaydol</router-link>
-          <router-link to="/login" role="link" class="link link-2">Giriş yap</router-link>
+          <router-link to="/signup" role="link" class="link link-1">Sign up</router-link>
+          <router-link to="/login" role="link" class="link link-2">Login</router-link>
         </div>
       </div>
     </div>
@@ -84,8 +84,8 @@ export default {
       <a href="/settings" class="link" role="link">
         <span>Ayarlar</span>
       </a>
-      <div><span class="link">© 2021 Twitter, Inc.</span></div>
     </nav>
+    <div class="copy-rigth"><span class="link">© 2021 Twitter, Inc.</span></div>
   </main>
 </template>
 
@@ -162,7 +162,7 @@ main{
         i{
           position: absolute;
           top: 15%;
-          left: 35%;
+          left: 30%;
           color: white;
           font-size: 20rem;
         }
@@ -170,7 +170,7 @@ main{
     }
   }
   nav{
-    padding: 12px 16px;
+    padding: 15px 16px 5px;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -183,13 +183,19 @@ main{
       margin: 4px 0;
       font-weight: 400;
       line-height: 16px;
-      font-size: 12px;
+      font-size: 1.2rem;
       span{
         font: inherit;
-        color: inherit;
-        white-space: inherit;
       }
     }
+  }
+}
+.copy-rigth{
+  text-align: center;
+  padding-bottom: 15px;
+  span{
+    font-size: 1.2rem;
+    color:rgb(91, 112, 131);
   }
 }
 

@@ -27,5 +27,26 @@
   input[type=checkbox]{
     cursor: pointer;
   }
+  .d-none{
+    display: none!important;
+  }
+  .d-block{
+    display: inline-block!important;
+  }
+  .p-16{
+    padding: 16px;
+  }
+  .top-10{
+    top: 10px!important;
+    font-size: 1.2rem!important;
+  }
+  .top-90{
+    top:90px!important;
+    font-size: 1.2rem!important;
+  }
+  .top-30{
+    top: 20px!important;
+    font-size: 1.3rem!important;
+  }
 }
 </style>

@@ -1,6 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 const passport = require('passport')
+require('dotenv').config()
 
 // ENG: initialize app & TR: app oluşturma
 const app = express()
@@ -9,8 +10,8 @@ const app = express()
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 app.use(cors())
-// app.use(passport.initialize())
-// require('./config/passport')(passport)
+app.use(passport.initialize())
+require('./config/passport')(passport)
 
 // ENG: Require database connect & TR: Database bağlantısı
 require('./mongo-connection')

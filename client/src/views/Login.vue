@@ -1,9 +1,28 @@
 <script>
+import { mapActions, mapGetters } from 'vuex'
+
 export default {
     data() {
         return {
-            email: null,
-            password: null
+            email: '',
+            password: ''
+        }
+    },
+    computed: {
+        ...mapGetters(['userInfo', 'isLoggedIn'])
+    },
+    methods: {
+        ...mapActions(['loginRequest']),
+        loginUser(){
+            let data = {
+                email: this.email,
+                password: this.password
+            }
+            this.loginRequest(data).then(() => {
+                if(this.isLoggedIn == true){
+                    this.$router.push('/home')
+                }
+            })
         }
     },
 }
@@ -17,14 +36,17 @@ export default {
                     <i class="fab fa-twitter"></i>
                     <h1 role="heading"><span>Log in to Twitter</span></h1>
                 </div>
+                <div role="alert" class="alert">
+                    <span>{{ userInfo.msg }}</span>
+                </div>
                 <div class="col-2">
-                    <form>
+                    <form @submit.prevent="loginUser">
                         <div class="form-group">
                             <input type="email" name="email" class="form-field" v-model="email">
                             <label for="email" class="form-label" :class="[email ? 'top-5' : '']">Email</label>
                             <input type="password" name="password" id="password" class="form-field" v-model="password">
                             <label for="password" class="form-label" :class="[password ? 'top-85' : '']">Password</label>
-                            <input type="submit" value="Giriş yap" class="form-field" :disabled="!email || !password">
+                            <input type="submit" value="Log in" class="form-field" :disabled="!email || !password">
                         </div>
                     </form>
                 </div>
@@ -48,8 +70,11 @@ export default {
            margin: 0 32px;
            margin-top: 20px;
            padding: 0px 16px;
-           .col-1{
+           .col-1, .col-2, .col-3, .alert{
                margin: 0 16px;
+           }
+           .col-1{
+               
                h1{
                    margin-top: 32px;
                    margin-bottom: 20px;
@@ -58,8 +83,16 @@ export default {
                    }
                }
            }
+           .alert{
+               margin-bottom: 20px;
+               border-radius: 10px;
+               span{
+                color: rgb(224, 36, 94);
+                font-size: 1.4rem;
+                line-height: 20px;
+               }
+           }
            .col-2{
-               margin: 0px 16px;
                .form-group{
                    position: relative;
                    .form-field{

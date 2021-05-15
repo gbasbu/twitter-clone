@@ -1,29 +1,72 @@
 <script>
+import { mapGetters, mapActions } from 'vuex'
+import axios from 'axios'
+const api = 'http://localhost:5000'
+
 export default {
   data() {
       return {
-          name: '',
-          email: '',
-          month: '',
-          day: '',
-          year: '',
-          password: '',
-          passwordType: 'password',
-          sortMohthString: ['','Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-          reg: /^\S+@\S+\.\S+$/,
-          step: 5,
-          checked: true
-      }
+        name: '',
+        email: '',
+        month: '',
+        day: '',
+        year: '',
+        password: '',
+        passwordType: 'password',
+        selectedFile: null,
+        sortMohthString: ['','Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        reg: /^\S+@\S+\.\S+$/,
+        imageUrl: 'https://res.cloudinary.com/dnmlcizxx/image/upload/v1620409537/twitter-clone/user_vxydcy.png',
+        step: 1,
+        checked: true
+    }
+  },
+  computed:{
+      ...mapGetters(['userInfo', 'user'])
   },
   methods: {
+      ...mapActions(['emailCheck', 'login']),
     isEmailValid(){
-        return (!this.email) ? '' : (this.reg.test(this.email)) ? '' : 'error-email'
+        if(this.userInfo.status !== false) return (!this.email) ? '' : (this.reg.test(this.email)) ? '' : 'Please enter a valid email.'
     },
     passLength(){
         return this.password.length
     },
     chancePasswordType(){
         this.passwordType = this.passwordType == 'password' ? 'text' : 'password'
+    },
+    onFileChange(e) {
+        this.selectedFile = e.target.files[0]
+        this.imageUrl = URL.createObjectURL(this.selectedFile)
+        const fd = new FormData()
+        fd.append('image', this.selectedFile, this.selectedFile.name)
+        axios.post(`${api}/user/change_picture`, fd)
+        setTimeout(() => {
+            this.$router.push('/home')
+        }, 2000);
+    },
+    emailControl(){
+        let user = {
+            email: this.email
+        }
+        if(!this.isEmailValid()) ( this.emailCheck(user))
+    },
+    async register(){
+        this.step = 5
+        let user = {
+            name: this.name,
+            email: this.email,
+            birthday: `${this.month},${this.day},${this.year}`
+        }
+        await axios.post(`${api}/user/register`, user)
+    },
+    chancePassword(){
+        let user = {
+            email: this.email,
+            password: this.password
+        }
+        axios.post(`${api}/user/add_password`, user)
+        this.login(user)
     }
   },
 }
@@ -32,17 +75,17 @@ export default {
 <template>
     <main role="main">
         <div class="cont-1">
-            <button class="back" @click="step--" v-if="step > 1 && step !== 5 && step !== 6">X</button>
-            <i class="fab fa-twitter" v-if="step !== 3"></i>
-            <h2 aria-level="2" role="heading" v-if="step == 3">
+            <button class="back" @click="step--" :class="[step >= 2 ? '' : 'd-none', step == 5 || step == 6 ? 'd-none' : '']">X</button>
+            <i class="fab fa-twitter" :class="[step == 3  ? 'd-none' : '']"></i>
+            <h2 aria-level="2" role="heading" :class="[step !== 3 ? 'd-none' : '']">
                 <span>Step 3 of 5</span>
             </h2>
-            <button class="link" @click="step++" v-if="step < 3" :disabled="!name || !email || !month || !day || !year ">Next</button>
-            <button class="link" @click="step++" v-if="step == 5" :disabled="passLength() < 8">Next</button>
-            <button class="link" @click="step = 3" v-if="step == 4">Done</button>
-            <router-link to="/home" class="link skip" @click="step = 7" v-if="step == 6">Skip for now</router-link>
+            <button class="link" @click="step++" :class="[step < 3 ? '' : 'd-none']" :disabled="!name || !email || !month || !day || !year || !userInfo.status">Next</button>
+            <button class="link" @click="step++" :class="[step !== 5 ? 'd-none' : '']" :disabled="passLength() < 8">Next</button>
+            <button class="link" @click="step = 3" :class="step !== 4 ? 'd-none' : 'd-block'">Done</button>
+            <router-link to="/home" class="link skip" :class="[step !== 6 ? 'd-none' : '']">Skip for now</router-link>
         </div>
-        <div class="cont-2" v-if="step == 1">
+        <div class="cont-2" :class="[step == 1 ? 'd-block' : 'd-none']">
             <div class="heading">
                 <span>Create your account</span>
             </div>
@@ -51,8 +94,9 @@ export default {
                     <input type="text" name="name" id="name" maxlength="50" v-model="name">
                     <span class="max">{{ name.length }}/50</span>
                     <label for="name" :class="[name ? 'top-10' : '', !name ? 'error-name' : '']">Name</label>
-                    <input type="email" name="email" id="email" v-model="email" :class="[isEmailValid()]">
-                    <span class="error-msg">Please enter a valid email.</span>
+                    <input type="email" name="email" id="email" @change="emailControl" v-model="email" :class="[isEmailValid() || userInfo.status == false ? 'error-email' : '']">
+                    <span class="error-msg">{{ isEmailValid() }}</span>
+                    <span class="error-msg error-msg-2" v-if="userInfo.status == false">{{ userInfo.msg }}</span>
                     <label for="email" :class="[email ? 'top-90' : '']">Email</label>
                 </div>
             </form>
@@ -145,36 +189,6 @@ export default {
                         <label for="year">Year</label>
                         <select name="year" id="year" aria-label="Year" class="year" v-model="year">
                             <option value selected disabled></option>
-                            <option value="1940">1940</option>
-                            <option value="1941">1941</option>
-                            <option value="1942">1942</option>
-                            <option value="1943">1943</option>
-                            <option value="1944">1944</option>
-                            <option value="1945">1945</option>
-                            <option value="1946">1946</option>
-                            <option value="1947">1947</option>
-                            <option value="1948">1948</option>
-                            <option value="1949">1949</option>
-                            <option value="1950">1950</option>
-                            <option value="1951">1951</option>
-                            <option value="1952">1952</option>
-                            <option value="1953">1953</option>
-                            <option value="1954">1954</option>
-                            <option value="1955">1955</option>
-                            <option value="1956">1956</option>
-                            <option value="1957">1957</option>
-                            <option value="1958">1958</option>
-                            <option value="1959">1959</option>
-                            <option value="1960">1960</option>
-                            <option value="1961">1961</option>
-                            <option value="1962">1962</option>
-                            <option value="1963">1963</option>
-                            <option value="1964">1964</option>
-                            <option value="1965">1965</option>
-                            <option value="1966">1966</option>
-                            <option value="1967">1967</option>
-                            <option value="1968">1968</option>
-                            <option value="1969">1969</option>
                             <option value="1970">1970</option>
                             <option value="1971">1971</option>
                             <option value="1972">1972</option>
@@ -232,7 +246,7 @@ export default {
                 </div>
             </div>
         </div>
-        <div class="cont-3" v-if="step == 2">
+        <div class="cont-3" :class="[step == 2 ? 'd-block' : 'd-none']">
             <div class="col-1">
                 <span>Customize your experience</span>
             </div>
@@ -255,7 +269,7 @@ export default {
                 <a href="https://help.twitter.com/managing-your-account/new-account-settings" class="link" rel="noopener noreferrer" target="_blank" role="link"><span>Help Center</span>.</a>
             </div>
         </div>
-        <div class="cont-4" v-if="step == 3">
+        <div class="cont-4" :class="[step == 3 ? 'd-block' : 'd-none']">
             <div class="col-1">
                 <span>Create your account</span>
             </div>
@@ -284,16 +298,16 @@ export default {
                 <button class="link" @click="step = 4"> Privacy Options</button>
             </div>
             <div class="col-4" role="button">
-                <button @click="step = 5">Sign up</button>
+                <button @click="register">Sign up</button>
             </div>
         </div>
-        <div class="cont-5" v-if="step == 4">
+        <div class="cont-5" :class="[step == 4 ? 'd-block' : 'd-none']">
             <div class="col-1">
                 <span class="title">Privacy</span>
             </div>
             <div class="col-2">
                 <div>
-                    <label>Let others find me by my email address</label>
+                    <p>Let others find me by my email address</p>
                     <span>People who have your email address will be able to connect with you on Twitter.</span>
                 </div>
                 <div class="input">
@@ -301,7 +315,7 @@ export default {
                 </div>
             </div>
         </div>
-        <div class="cont-6" v-if="step == 5">
+        <div class="cont-6" :class="[step == 5 ? 'd-block' : 'd-none']">
             <div class="col-1">
                 <span>You'll need a password</span>
             </div>
@@ -309,13 +323,13 @@ export default {
                 <span>Make sure it’s 8 characters or more.</span>
             </div>
             <div class="col-3">
-                <input :type="passwordType" name="password" id="password" minlength="8" v-model="password">
+                <input :type="passwordType" @change="chancePassword" name="password" id="password" minlength="8" v-model="password">
                 <label for="password" :class="[password ? 'top-30' : '']">Password</label>
                 <button @click="chancePasswordType" v-if="passwordType == 'password'">Reveal password</button>
                 <button @click="chancePasswordType" v-if="passwordType == 'text'">Hide password</button>
             </div>
         </div>
-        <div class="cont-7" v-if="step == 6">
+        <div class="cont-7" :class="[step == 6 ? 'd-block' : 'd-none']">
             <div class="col-1">
                 <span>Pick a profile picture</span>
             </div>
@@ -323,8 +337,12 @@ export default {
                 <span>Have a favorite selfie? Upload it now.</span>
             </div>
             <div class="col-3">
+                <div class="select">
+                    <input type="file" name="image" id="image" @change="onFileChange">
+                    <i class="fa fa-camera-retro" aria-hidden="true"></i>
+                </div>
                 <figure>
-                    <img src="https://res.cloudinary.com/dnmlcizxx/image/upload/v1620409537/twitter-clone/user_vxydcy.png" width="200" height="200" alt="User Picture">
+                    <img :src="imageUrl" width="200" height="200" alt="User Picture">
                 </figure>
             </div>
         </div>
@@ -336,18 +354,6 @@ export default {
         display: flex;
         flex-direction: column;
 
-        .top-10{
-            top: 10px!important;
-            font-size: 1.2rem!important;
-        }
-        .top-90{
-            top:90px!important;
-            font-size: 1.2rem!important;
-        }
-        .top-30{
-            top: 20px!important;
-            font-size: 1.3rem!important;
-        }
         input{
             width: 100%;
             height: 60px;
@@ -367,11 +373,31 @@ export default {
             opacity: .6;
             transition: .2s;
         }
+        .error-email{
+            outline-color: #E0245E!important;
+            border-color: #E0245E!important;
+            ~label[for=email]{
+                color: #E0245E;
+            }
+            ~ .error-msg{
+                display: inline-block!important;
+                color: #E0245E;
+                font-size: 1.1rem;
+                margin-left: 10px;
+            }
+            ~ .error-msg-2{
+                margin-left: 0!important;
+            }
+            &:focus ~ label[for=email]{
+                color: #E0245E!important;
+            }
+        }
         .cont-1{
             position: fixed;
             width: 100%;
             height: 50px;
             padding: 10px 15px;
+            background-color: white;
         i{
             position: absolute;
             left: 50%;
@@ -432,25 +458,8 @@ export default {
             }
         }
         }
-        .error-email{
-            outline-color: #E0245E!important;
-            border-color: #E0245E!important;
-            ~label[for=email]{
-                color: #E0245E;
-            }
-            ~ .error-msg{
-                display: inline-block!important;
-                color: #E0245E;
-                font-size: 1.1rem;
-                margin-left: 10px;
-            }
-            &:focus ~ label[for=email]{
-                color: #E0245E!important;
-            }
-        }
         .cont-2{
             margin: 20px 30px;
-            
             .heading{
                 margin-top: 50px;
                 margin-bottom: 20px;
@@ -561,7 +570,7 @@ export default {
             }
         }
         .cont-3{
-            margin: 0 30px; 
+            margin: 0 30px;
             .col-1{
                 font-size: 2rem;
                 line-height: 27px;
@@ -698,9 +707,10 @@ export default {
                 display: grid;
                 grid-template-columns: 11fr 1fr;
                 margin-top: 30px;
-                label, span{
-                    display: block;
-                    font-size: 1.3rem;
+                p{
+                    font-size: 1.4rem;
+                    font-weight: 400;
+                    margin-bottom: 5px;
                 }
                 span{
                     color: rgb(91, 112, 131);
@@ -788,7 +798,35 @@ export default {
                 margin: 64px 0;
                 display: flex;
                 justify-content: center;
-                align-items: center;
+                position: relative;
+                i, input{
+                    position: absolute;
+                    left: 50%;
+                    top: 50%;
+                    transform: translate(-50%, -50%);
+                }
+                i{
+                    font-size: 3rem;
+                    z-index: 0;
+                    color: rgb(15, 20, 25);
+                }
+                input{
+                    width: 200px;
+                    height: 200px;
+                    opacity: 0;
+                    cursor: pointer;
+                    z-index: 2;
+                    padding-left: 220px;
+                    border-radius: 50%;
+                    &:hover{
+                        ~i{
+                            opacity: .5;
+                        }
+                    }
+                }
+                img{
+                    border-radius: 50%;
+                }
             }
         }
     }

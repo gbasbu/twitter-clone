@@ -9,7 +9,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(['userInfo', 'isLoggedIn'])
+        ...mapGetters(['info', 'isLoggedIn'])
     },
     methods: {
         ...mapActions(['loginRequest']),
@@ -30,28 +30,28 @@ export default {
 
 <template>
     <main role="main">
-        <div class="container">
-            <div class="row">
-                <div class="col-1">
-                    <i class="fab fa-twitter"></i>
-                    <h1 role="heading"><span>Log in to Twitter</span></h1>
+        <div class="container-fluid">
+            <div class="row mx-4 mt-4 px-4">
+                <div class="col-12 mb-3 my-3">
+                    <svg class="mb-4" viewBox="0 0 24 24"><g><path d="M23.643 4.937c-.835.37-1.732.62-2.675.733.962-.576 1.7-1.49 2.048-2.578-.9.534-1.897.922-2.958 1.13-.85-.904-2.06-1.47-3.4-1.47-2.572 0-4.658 2.086-4.658 4.66 0 .364.042.718.12 1.06-3.873-.195-7.304-2.05-9.602-4.868-.4.69-.63 1.49-.63 2.342 0 1.616.823 3.043 2.072 3.878-.764-.025-1.482-.234-2.11-.583v.06c0 2.257 1.605 4.14 3.737 4.568-.392.106-.803.162-1.227.162-.3 0-.593-.028-.877-.082.593 1.85 2.313 3.198 4.352 3.234-1.595 1.25-3.604 1.995-5.786 1.995-.376 0-.747-.022-1.112-.065 2.062 1.323 4.51 2.093 7.14 2.093 8.57 0 13.255-7.098 13.255-13.254 0-.2-.005-.402-.014-.602.91-.658 1.7-1.477 2.323-2.41z"></path></g></svg>
+                    <h1 role="heading"><span>Login to Twitter</span></h1>
                 </div>
                 <div role="alert" class="alert">
-                    <span>{{ userInfo.msg }}</span>
+                    <span>{{ info.msg }}</span>
                 </div>
-                <div class="col-2">
+                <div class="col-12 my-3 col-2">
                     <form @submit.prevent="loginUser">
-                        <div class="form-group">
-                            <input type="email" name="email" class="form-field" v-model="email">
-                            <label for="email" class="form-label" :class="[email ? 'top-5' : '']">Email</label>
-                            <input type="password" name="password" id="password" class="form-field" v-model="password">
-                            <label for="password" class="form-label" :class="[password ? 'top-85' : '']">Password</label>
-                            <input type="submit" value="Log in" class="form-field" :disabled="!email || !password">
+                        <div class="form-group position-relative">
+                            <input type="email" name="email" class="form-field d-inline-block mb-4 pt-3 rounded-3" v-model="email">
+                            <label for="email" class="form-label position-absolute" :class="[email ? 'top-5' : '']">Email</label>
+                            <input type="password" name="password" id="password" class="form-field mb-4 pt-3 rounded-3" v-model="password">
+                            <label for="password" class="form-label position-absolute" :class="[password ? 'top-85' : '']">Password</label>
+                            <input type="submit" value="Login" class="form-field" :disabled="!email || !password">
                         </div>
                     </form>
                 </div>
-                <div class="col-3">
-                    <router-link to="/begin_password_reset" class="link link-1">Forgot password?</router-link> .
+                <div class="col-12 my-3 col-3">
+                    <router-link to="/reset_password" class="link link-1">Did you forget your password?</router-link> .
                     <router-link to="/signup" class="link link-2">Sign up for Twitter</router-link>
                 </div>
             </div>
@@ -60,56 +60,44 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+@import '../assets/css/main.scss';
+
    main{
        height: 100vh;
-       display: flex;
-       justify-content: center;
-       .container{
+       .container-fluid{
            max-width: 500px;
+            @media (min-width: 500px) { 
+                margin: 0 auto;        
+            }
         .row{
-           margin: 0 32px;
-           margin-top: 20px;
-           padding: 0px 16px;
-           .col-1, .col-2, .col-3, .alert{
-               margin: 0 16px;
-           }
-           .col-1{
-               
-               h1{
-                   margin-top: 32px;
-                   margin-bottom: 20px;
-                   span{
-                       font-size: 31px;
-                   }
-               }
-           }
            .alert{
-               margin-bottom: 20px;
                border-radius: 10px;
                span{
                 color: rgb(224, 36, 94);
-                font-size: 1.4rem;
+                font-size: 1rem;
                 line-height: 20px;
                }
            }
+           svg{
+               height: 40px;
+               fill: $first-blue;
+           }
+           h1[role=heading] > span{
+               font-size: 31px;
+               font-weight: 700;
+           }
            .col-2{
                .form-group{
-                   position: relative;
                    .form-field{
                    width: 100%;
                    height: 60px;
-                   margin-bottom: 20px;
                    border: 1px solid lightgray;
-                   border-radius: 5px;
-                   padding-left:  10px;
                    font-size: 1.5rem;
                    background: transparent;
-                   padding-top: 20px;
                 }
                 .form-label{
-                    position: absolute;
                     left: 10px;
-                    font-size: 1.5rem;
+                    font-size: 1rem;
                     cursor: text;
                     opacity: .6;
                     transition: .2s;
@@ -120,31 +108,36 @@ export default {
                 label[for=password]{
                     top: 100px;
                 }
+                input[type=email], input[type=password]{
+                    font-size: 1rem;
+                    padding-left: 10px;
+                }
                 input[type=email]:focus{
                     ~ label[for=email]{
                         top: 5px;
-                        font-size: 1.3rem;
-                        color: #1DA1F2;
+                        font-size: .8rem;
+                        color: $first-blue;
                         padding-top: 6px;
                     }
-                    outline-color: #1DA1F2;
+                    outline-color: $first-blue;
                 }
                 input[type=password]:focus{
                     ~ label[for=password]{
                         top: 85px;
-                        font-size: 1.3rem;
-                        color: #1DA1F2;
+                        font-size: .8rem;
+                        color: $first-blue;
                         padding-top: 6px;
                     }
-                    outline-color: #1DA1F2;
+                    outline-color: $first-blue;
                 }
                 input[type=submit]{
                     padding: 0;
                     height: 50px;
-                    background-color: #1DA1F2;
+                    background-color: $first-blue;
                     border-radius: 50px;
                     color: white;
-                    font-weight: 700;
+                    font-size: 1rem;
+                    font-weight: 600;
                     cursor: pointer;
 
                     &:disabled{
@@ -159,9 +152,12 @@ export default {
                justify-content: center;
                margin-top: 10px;
                .link{
-                   color: #1B95E0;
+                   color: $second-blue;
                    cursor: pointer;
-                   font-size: 1.2rem;
+                   font-size: .9rem;
+                   @media (max-width: 500px) { 
+                        font-size: .8rem;        
+                    }
                }
                .link-1{
                    margin-right: 7px;
@@ -174,12 +170,12 @@ export default {
     }
     .top-5{
         top: 5px!important;
-        font-size: 1.3rem!important;
+        font-size: .8rem!important;
         padding-top: 6px!important;
     }
     .top-85{
         top: 85px!important;
-        font-size: 1.3rem!important;
+        font-size: .8rem!important;
         padding-top: 6px!important;
     }
    } 

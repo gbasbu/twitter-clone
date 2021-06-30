@@ -1,0 +1,31 @@
+$first-blue: rgba(29,161,242,1);
+$second-blue: #1B95E0;
+
+*{
+    box-sizing: border-box;
+    font-size: 10px;
+    font-family: TwitterChirpExtendedHeavy, Verdana, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.link{
+    text-decoration: none;
+    color: $first-blue;
+    font-size: 15px;
+}
+.SubmitButton{
+    display: block;
+    background-color: $first-blue;
+    border: 1px solid $first-blue;
+    color: #fff;
+    border-radius: 100px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 6px 16px;
+    text-align: center;
+    position: relative;
+    white-space: nowrap;
+}
+.b-red{
+    border: 1px solid red!important;
+}

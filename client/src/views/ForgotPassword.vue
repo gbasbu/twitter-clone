@@ -16,7 +16,7 @@ export default {
         ...mapGetters(['info', 'user', 'step'])
     },
     methods: {
-        ...mapActions(['fetchUsername', 'verifyUserInfo','sendVerifyCode', 'checkVerifyCode', 'resetPassword','restartStep']),
+        ...mapActions(['fetchUsername', 'verifyUserInfo','sendVerifyCode', 'checkVerifyCode', 'resetPassword','restartStep','login']),
         fetchUser(){
             let data = {
                 username: this.username
@@ -56,13 +56,24 @@ export default {
         changePassword(){
             let data = {
                 username: this.username,
+                email: this.email,
                 password: this.password
             }
             if(this.password.length > 0 && this.confirm_password.length > 0 && this.password == this.confirm_password) this.resetPassword(data)
         },
-        continueButton(){
-            this.$router.push('/login')
+        goStepOne(){
             this.restartStep()
+            this.username = ''
+            this.email = ''
+        },
+        continueButton(){
+            this.login(this.user).then(() => this.$router.push('/home'))
+            setTimeout(() => { this.restartStep() }, 2000);
+            this.username = ''
+            this.email = ''
+            this.password = ''
+            this.confirm_password = ''
+            this.verify_code = ''
         }
     },
 }
@@ -118,7 +129,7 @@ export default {
                     <p class="mt-5">If you don't see the email, check other places it might be, like your junk, spam, social, or other folders</p>
                 </form>
                 <div class="section-footer pt-3" v-if="step == 4">
-                    <button @click="step = 1">Didn’t receive your code?</button>
+                    <button @click="goStepOne" class="btn p-0">Didn’t receive your code?</button>
                 </div>
             </section>
             <!-- Step 5 -->

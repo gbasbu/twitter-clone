@@ -4,7 +4,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const passport = require("passport");
 const UserService = require('../services/user-service')
-const key = require('../config/keys').tokenKey;
 const cloudinary = require('cloudinary')
 const upload = require('../utils/multer')
 const sgMail = require("@sendgrid/mail");
@@ -28,7 +27,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     const user = await UserService.findByEmail(req.body.email)
     const payload = { _id: user._id, name: user.name, email: user.email }
-    jwt.sign(payload, key, { expiresIn: 604800 }, (err, token) => {
+    jwt.sign(payload, process.env.JWT_STRATEGY_SECRET_KEY, { expiresIn: 604800 }, (err, token) => {
         res.status(200).json({
             success: true,
             user: user,
@@ -67,7 +66,7 @@ router.post('/login_request', async (req, res) => {
         bcrypt.compare(req.body.password, user.password).then((isMatch) => {
             if(isMatch){
                 const payload = { _id: user._id, name: user.name, email: user.email }
-                jwt.sign(payload, key, { expiresIn: 604800 }, (err, token) => {
+                jwt.sign(payload, process.env.JWT_STRATEGY_SECRET_KEY, { expiresIn: 604800 }, (err, token) => {
                     res.status(200).json({ success: true, user: user, token: `Bearer ${token}` })
                 })
             }else{

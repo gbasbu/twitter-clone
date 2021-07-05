@@ -66,6 +66,15 @@ export const mutations = {
     },
     RESTART_STEP(state){
         state.step = 1
+    },
+    PLUS_STEP(state){
+        state.step++
+    },
+    MINUS_STEP(state){
+        state.step--
+    },
+    GO_STEP_5(state){
+        state.step = 5
     }
 }
 
@@ -129,6 +138,15 @@ export const actions = {
     },
     // Restart Step
     async restartStep({ commit }) {
-        commit('RESTART_STEP')
+        await commit('RESTART_STEP')
+    },
+    async plusStep({commit}) {
+        await commit('PLUS_STEP')
+    },
+    async minusStep({commit}) {
+        await commit('MINUS_STEP')
+    },
+    async goStep5({commit}) {
+        await commit('GO_STEP_5')
     }
 }
